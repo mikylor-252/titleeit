@@ -360,7 +360,8 @@ async function wakeBackend(){
   for(let attempt = 1; attempt <= 3; attempt++){
     try{
       // This GET safely wakes a sleeping Render service without creating a job.
-      await fetchWithTimeout(`${API_BASE}/api/status/warmup`, {}, 25000);
+      const response = await fetchWithTimeout(`${API_BASE}/health`, {}, 25000);
+      if(!response.ok) throw new Error(`Server returned ${response.status}`);
       return;
     }catch(err){
       if(attempt === 3) throw err;

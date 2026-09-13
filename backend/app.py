@@ -272,6 +272,11 @@ def process_job(job_id: str, video_path: Path, want_translation: bool):
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
+@app.get("/health")
+def health_check():
+    return jsonify({"status": "ok"}), 200
+
+
 @app.post("/api/upload")
 def upload_video():
     if "video" not in request.files:
