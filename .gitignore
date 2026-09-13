@@ -12,3 +12,5 @@ backend/outputs/
 *.webm
 *.m4v
 .env
+subs/
+titleit/
