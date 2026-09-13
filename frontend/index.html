@@ -9,6 +9,9 @@
 <style>
   :root{
     --white:#FFFFFF;
+    --purple-ink:#160d2d;
+    --purple-mid:#5b2c83;
+    --purple-bright:#a875ff;
     --radius-lg:26px;
     --radius-md:16px;
   }
@@ -23,37 +26,37 @@
   }
   h1,h2,h3,.brand-name{font-family:'Poppins',sans-serif;}
 
-  /* ---------- Animated gradient backdrop, blue <-> brown ---------- */
+  /* ---------- Animated purple liquid-glass backdrop ---------- */
   .bg-layer{
     position:fixed;inset:0;z-index:-2;transition:opacity 1.6s ease;
   }
   .bg-blue{
     opacity:1;
     background:
-      radial-gradient(circle at 16% 20%, rgba(101, 220, 133, 0.55), transparent 55%),
-      radial-gradient(circle at 86% 14%, rgba(68, 227, 24, 0.35), transparent 50%),
-      radial-gradient(circle at 50% 92%, rgb(12, 142, 31), transparent 60%),
-      linear-gradient(160deg, #0a3013 0%, #145422 55%, #0d3f0a 100%);
+      radial-gradient(circle at 16% 20%, rgba(196, 125, 255, 0.55), transparent 55%),
+      radial-gradient(circle at 86% 14%, rgba(99, 66, 230, 0.38), transparent 50%),
+      radial-gradient(circle at 50% 92%, rgba(41, 18, 84, 0.95), transparent 60%),
+      linear-gradient(160deg, #160d2d 0%, #3b1d61 55%, #171039 100%);
   }
   .bg-brown{
     opacity:0;
     background:
-      radial-gradient(circle at 20% 24%, rgba(224,139,75,0.55), transparent 55%),
-      radial-gradient(circle at 85% 18%, rgba(255,184,112,0.35), transparent 50%),
-      radial-gradient(circle at 50% 92%, rgba(62,35,19,0.88), transparent 60%),
-      linear-gradient(160deg, #22120A 0%, #42230F 55%, #22120A 100%);
+      radial-gradient(circle at 20% 24%, rgba(245, 145, 255, 0.48), transparent 55%),
+      radial-gradient(circle at 85% 18%, rgba(129, 105, 255, 0.4), transparent 50%),
+      radial-gradient(circle at 50% 92%, rgba(38, 14, 73, 0.92), transparent 60%),
+      linear-gradient(160deg, #24113e 0%, #582c78 55%, #24113e 100%);
   }
   body.processing .bg-blue{opacity:0;}
   body.processing .bg-brown{opacity:1;}
 
   /* ---------- Glass ---------- */
   .glass{
-    background:rgba(255,255,255,0.10);
+    background:linear-gradient(135deg, rgba(255,255,255,0.16), rgba(210,174,255,0.07));
     backdrop-filter:blur(28px) saturate(170%);
     -webkit-backdrop-filter:blur(28px) saturate(170%);
-    border:1px solid rgba(255,255,255,0.25);
+    border:1px solid rgba(232,214,255,0.30);
     border-radius:var(--radius-lg);
-    box-shadow:0 10px 36px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+    box-shadow:0 10px 36px rgba(12,4,28,0.42), inset 0 1px 0 rgba(255,255,255,0.22);
   }
 
   .wrap{max-width:600px;margin:0 auto;padding:0 20px;}
@@ -98,7 +101,7 @@
   .dropzone svg{opacity:.85;margin-bottom:12px;}
   .dropzone p{margin:0 0 14px;font-size:14px;color:rgba(255,255,255,0.75);}
   .browse-btn{
-    background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.35);
+    background:rgba(184,133,255,0.24);color:#fff;border:1px solid rgba(232,214,255,0.38);
     padding:11px 24px;border-radius:999px;font-weight:600;font-size:14px;
     backdrop-filter:blur(10px);
   }
@@ -140,12 +143,12 @@
     content:"";position:absolute;width:20px;height:20px;left:2px;top:2px;
     background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.3);
   }
-  .switch input:checked + .slider{background:rgba(111,227,160,0.55);border-color:rgba(111,227,160,0.7);}
+  .switch input:checked + .slider{background:rgba(168,117,255,0.65);border-color:rgba(232,214,255,0.72);}
   .switch input:checked + .slider::before{transform:translateX(20px);}
 
   .generate-btn{
     width:100%;margin-top:22px;padding:15px;border:none;border-radius:16px;
-    background:rgba(255,255,255,0.22);color:#fff;font-weight:700;font-size:15px;
+    background:linear-gradient(135deg, rgba(168,117,255,0.65), rgba(102,65,190,0.7));color:#fff;font-weight:700;font-size:15px;
     border:1px solid rgba(255,255,255,0.35);backdrop-filter:blur(10px);
     display:flex;align-items:center;justify-content:center;gap:8px;
   }
@@ -204,7 +207,7 @@
   .dl-item .dtitle{font-size:13.5px;font-weight:600;}
   .dl-item .dsub{font-size:11.5px;color:rgba(255,255,255,0.55);}
   .dl-btn{
-    background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.32);
+    background:rgba(184,133,255,0.28);color:#fff;border:1px solid rgba(232,214,255,0.38);
     padding:8px 16px;border-radius:999px;font-size:12.5px;font-weight:600;text-decoration:none;
     white-space:nowrap;
   }
@@ -241,7 +244,7 @@
     </div>
     <div>
       <div class="brand-name">SubSync</div>
-      <div class="brand-sub">Upload a video, get synced .srt subtitles</div>
+          <div class="brand-sub">Upload a video, get synced .srt and .ass subtitles</div>
     </div>
   </div>
 </header>
@@ -315,7 +318,7 @@
       </div>
       <div class="preview-caption-label">
         <span>Caption style preview</span>
-        <span>White text · sans-serif · 65% black box</span>
+        <span>White text · outline · translucent glass-like box</span>
       </div>
 
       <div class="dl-list" id="dl-list"></div>
@@ -515,17 +518,15 @@ function showResults(jobId, data){
   setupCaptionPreview(jobId, 'srt');
 
   const items = [
-    { key:'ass', title:'Subtitles (.ass) — styled', sub:'White text · sans-serif · 65% black box · original language', kind:'ass' },
+    { key:'ass', title:'Subtitles (.ass) — styled', sub:'White text · outline · translucent black box · original language', kind:'ass' },
   ];
   if(data.translated_ass_file){
-    items.push({ key:'ass-en', title:'Subtitles (.ass) — styled', sub:'White text · sans-serif · 65% black box · English', kind:'ass-en' });
+    items.push({ key:'ass-en', title:'Subtitles (.ass) — styled', sub:'White text · outline · translucent black box · English', kind:'ass-en' });
   }
   items.push({ key:'srt', title:'Subtitles (.srt) — plain text', sub:'No built-in style, for editors that need plain SRT', kind:'srt' });
   if(data.translated_srt_file){
     items.push({ key:'srt-en', title:'Subtitles (.srt) — plain text', sub:'No built-in style · English', kind:'srt-en' });
   }
-  items.push({ key:'audio', title:'Extracted audio (.wav)', sub:'For reference or re-editing', kind:'audio' });
-
   dlList.innerHTML = items.map(it => `
     <div class="dl-item">
       <div class="dic">

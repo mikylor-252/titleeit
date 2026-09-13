@@ -140,8 +140,7 @@ def ass_escape(text: str) -> str:
 
 
 # ASS colours are &HAABBGGRR. Alpha is inverted: 00 = fully opaque, FF = fully
-# transparent. "65% opacity black background" -> visible 65% -> alpha for the
-# *invisible* 35% -> round(0.35 * 255) = 89 = 0x59.
+# transparent. &H66 gives a translucent black background.
 ASS_STYLE_TEMPLATE = """[Script Info]
 Title: SubSync generated subtitles
 ScriptType: v4.00+
@@ -152,7 +151,7 @@ PlayResY: 720
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Arial,28,&H00FFFFFF,&H000000FF,&H00000000,&H59000000,0,0,0,0,100,100,0,0,3,0,0,2,40,40,40,1
+Style: Default,Arial,28,&H00FFFFFF,&H000000FF,&H00000000,&H66000000,0,0,0,0,100,100,0,0,3,1,1,2,40,40,40,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -163,9 +162,9 @@ def segments_to_ass(segments) -> str:
     """
     Builds a .ass file with the style baked into the header:
     - PrimaryColour &H00FFFFFF -> white text, alpha 00 (fully opaque)
-    - BackColour   &H59000000 -> black box, alpha 59 (~65% visible opacity)
-    - BorderStyle 3            -> renders BackColour as an opaque box behind
-                                   the text (not just an outline)
+    - BackColour   &H66000000 -> translucent black box
+    - BorderStyle 3            -> renders BackColour as a box behind the text
+    - Outline 1, Shadow 1      -> thin outline and soft shadow
     - Fontname Arial, Fontsize 28 -> small sans-serif text
     Change Fontname/Fontsize/the two colour values here if you want a
     different look; every player that reads this file will follow it.
@@ -202,9 +201,9 @@ def extract_audio(video_path: Path, audio_path: Path):
 # Background job
 # ---------------------------------------------------------------------------
 def process_job(job_id: str, video_path: Path, want_translation: bool):
+    audio_path = OUTPUT_DIR / f"{job_id}.wav"
     try:
         set_job(job_id, status="extracting_audio", progress=10)
-        audio_path = OUTPUT_DIR / f"{job_id}.wav"
         extract_audio(video_path, audio_path)
 
         set_job(job_id, status="transcribing", progress=35)
@@ -231,7 +230,6 @@ def process_job(job_id: str, video_path: Path, want_translation: bool):
             "detected_language": info.language,
             "srt_file": srt_path.name,
             "ass_file": ass_path.name,
-            "audio_file": audio_path.name,
             "translated_srt_file": None,
             "translated_ass_file": None,
         }
@@ -266,6 +264,7 @@ def process_job(job_id: str, video_path: Path, want_translation: bool):
         # and subtitle files in OUTPUT_DIR are what get served/downloaded.
         try:
             video_path.unlink(missing_ok=True)
+            audio_path.unlink(missing_ok=True)
         except Exception:
             pass
 
@@ -322,7 +321,6 @@ def download_file(job_id, kind):
         "srt-en": job.get("translated_srt_file"),    # English translation, plain text
         "ass": job.get("ass_file"),                  # original-language, styled
         "ass-en": job.get("translated_ass_file"),    # English translation, styled
-        "audio": job.get("audio_file"),              # extracted audio track
     }
     filename = filename_map.get(kind)
     if not filename:
