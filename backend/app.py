@@ -29,6 +29,7 @@ Notes
 """
 
 import os
+import re
 import uuid
 import threading
 import subprocess
@@ -139,6 +140,12 @@ def ass_escape(text: str) -> str:
     return text.strip().replace("\n", " ").replace("{", "(").replace("}", ")")
 
 
+def subtitle_name(video_filename: str, job_id: str) -> str:
+    stem = Path(video_filename).stem
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "_", stem).strip("._-") or "video"
+    return f"{stem}-{job_id[:8]}"
+
+
 # ASS colours are &HAABBGGRR. Alpha is inverted: 00 = fully opaque, FF = fully
 # transparent. &H66 gives a translucent black background.
 ASS_STYLE_TEMPLATE = """[Script Info]
@@ -200,7 +207,9 @@ def extract_audio(video_path: Path, audio_path: Path):
 # ---------------------------------------------------------------------------
 # Background job
 # ---------------------------------------------------------------------------
-def process_job(job_id: str, video_path: Path, want_translation: bool):
+def process_job(
+    job_id: str, video_path: Path, subtitle_base: str, want_translation: bool
+):
     audio_path = OUTPUT_DIR / f"{job_id}.wav"
     try:
         set_job(job_id, status="extracting_audio", progress=10)
@@ -219,9 +228,9 @@ def process_job(job_id: str, video_path: Path, want_translation: bool):
             condition_on_previous_text=CONDITION_ON_PREVIOUS_TEXT,
         )
         segments = list(segments_iter)
-        srt_path = OUTPUT_DIR / f"{job_id}.srt"
+        srt_path = OUTPUT_DIR / f"{subtitle_base}.srt"
         srt_path.write_text(segments_to_srt(segments), encoding="utf-8")
-        ass_path = OUTPUT_DIR / f"{job_id}.ass"
+        ass_path = OUTPUT_DIR / f"{subtitle_base}.ass"
         ass_path.write_text(segments_to_ass(segments), encoding="utf-8")
 
         result = {
@@ -248,9 +257,9 @@ def process_job(job_id: str, video_path: Path, want_translation: bool):
                 condition_on_previous_text=CONDITION_ON_PREVIOUS_TEXT,
             )
             t_segments = list(t_segments_iter)
-            t_srt_path = OUTPUT_DIR / f"{job_id}.en.srt"
+            t_srt_path = OUTPUT_DIR / f"{subtitle_base}.en.srt"
             t_srt_path.write_text(segments_to_srt(t_segments), encoding="utf-8")
-            t_ass_path = OUTPUT_DIR / f"{job_id}.en.ass"
+            t_ass_path = OUTPUT_DIR / f"{subtitle_base}.en.ass"
             t_ass_path.write_text(segments_to_ass(t_segments), encoding="utf-8")
             result["translated_srt_file"] = t_srt_path.name
             result["translated_ass_file"] = t_ass_path.name
@@ -294,13 +303,16 @@ def upload_video():
 
     job_id = uuid.uuid4().hex
     video_path = UPLOAD_DIR / f"{job_id}{ext}"
+    subtitle_base = subtitle_name(file.filename, job_id)
     file.save(video_path)
 
     with JOBS_LOCK:
         JOBS[job_id] = {"status": "queued", "progress": 0}
 
     thread = threading.Thread(
-        target=process_job, args=(job_id, video_path, want_translation), daemon=True
+        target=process_job,
+        args=(job_id, video_path, subtitle_base, want_translation),
+        daemon=True,
     )
     thread.start()
 
@@ -335,4 +347,4 @@ def download_file(job_id, kind):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
