@@ -307,7 +307,7 @@
 
 <script>
 /* Point this at wherever app.py is running. */
-const API_BASE = "https://subsamy.onrender.com";
+const API_BASE = "http://localhost:5000";
 
 const body = document.body;
 const dropzone = document.getElementById('dropzone');
@@ -425,7 +425,7 @@ generateBtn.addEventListener('click', async ()=>{
 
   try{
     statusPillText.textContent = 'Connecting';
-    showError('Connecting to server, please wait while Render wakes up...');
+    showError('Connecting to your local backend, please wait...');
     await wakeBackend();
     clearError();
     const res = await fetchWithTimeout(
