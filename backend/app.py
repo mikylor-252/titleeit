@@ -151,7 +151,7 @@ PlayResY: 720
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Arial,28,&H00FFFFFF,&H000000FF,&H00000000,&H66000000,0,0,0,0,100,100,0,0,3,1,1,2,40,40,40,1
+Style: Default,Arial,22,&H00FFFFFF,&H000000FF,&H00000000,&H66000000,0,0,0,0,100,100,0,0,3,1,1,2,40,40,40,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -165,7 +165,7 @@ def segments_to_ass(segments) -> str:
     - BackColour   &H66000000 -> translucent black box
     - BorderStyle 3            -> renders BackColour as a box behind the text
     - Outline 1, Shadow 1      -> thin outline and soft shadow
-    - Fontname Arial, Fontsize 28 -> small sans-serif text
+    - Fontname Arial, Fontsize 22 -> small sans-serif text
     Change Fontname/Fontsize/the two colour values here if you want a
     different look; every player that reads this file will follow it.
     """
