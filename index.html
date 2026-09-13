@@ -376,6 +376,26 @@ function clearError(){
   errorBox.classList.remove('show');
 }
 
+function fetchWithTimeout(url, options = {}, timeoutMs = 30000){
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timeout));
+}
+
+async function wakeBackend(){
+  for(let attempt = 1; attempt <= 3; attempt++){
+    try{
+      // This GET safely wakes a sleeping Render service without creating a job.
+      await fetchWithTimeout(`${API_BASE}/api/status/warmup`, {}, 25000);
+      return;
+    }catch(err){
+      if(attempt === 3) throw err;
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+  }
+}
+
 /* ---- file selection ---- */
 browseBtn.addEventListener('click', ()=>fileInput.click());
 dropzone.addEventListener('click', (e)=>{ if(e.target===dropzone) fileInput.click(); });
@@ -415,14 +435,26 @@ generateBtn.addEventListener('click', async ()=>{
   formData.append('translate', translateToggle.checked ? 'true' : 'false');
 
   try{
-    const res = await fetch(`${API_BASE}/api/upload`, { method:'POST', body: formData });
+    statusPillText.textContent = 'Connecting';
+    showError('Connecting to server, please wait while Render wakes up...');
+    await wakeBackend();
+    clearError();
+    const res = await fetchWithTimeout(
+      `${API_BASE}/api/upload`,
+      { method:'POST', body: formData },
+      120000
+    );
     const data = await res.json();
     if(!res.ok){ throw new Error(data.error || 'Upload failed.'); }
 
     enterProcessingState();
     pollStatus(data.job_id);
   }catch(err){
-    showError(err.message || 'Could not reach the backend. Is app.py running?');
+    const message = err.name === 'AbortError'
+      ? 'The server took too long to respond. Please try again in a moment.'
+      : (err.message || 'Could not reach the backend.');
+    showError(message);
+    statusPillText.textContent = 'Ready';
     generateBtn.disabled = false;
   }
 });
