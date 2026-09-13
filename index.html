@@ -431,7 +431,7 @@ generateBtn.addEventListener('click', async ()=>{
     const res = await fetchWithTimeout(
       `${API_BASE}/api/upload`,
       { method:'POST', body: formData },
-      120000
+      300000
     );
     const data = await readApiResponse(res);
 
